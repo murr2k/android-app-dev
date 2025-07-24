@@ -3,12 +3,14 @@ workflows:
     name: Android App CI/CD
     instance_type: linux_x2
     max_build_duration: 60
+    working_directory: android
     environment:
       groups: []
         # - firebase_credentials  # Uncomment when Firebase Test Lab is configured
       vars:
         PACKAGE_NAME: "com.example.app"
         GOOGLE_PLAY_TRACK: alpha
+        CM_BUILD_DIR: ".."
       java: 17
       
     triggering:
@@ -27,29 +29,29 @@ workflows:
           include: true
           
     scripts:
+      - name: Check project structure
+        script: |
+          pwd
+          ls -la
+          
       - name: Set up local.properties
         script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
-          
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
           
       - name: Build Android APK
         script: |
-          cd android
           ./gradlew assembleDebug
           
       - name: Build Android App Bundle
         script: |
-          cd android
           ./gradlew bundleDebug
           
       - name: Run unit tests
         script: |
-          cd android
           ./gradlew test
           
       - name: Build debug and test APKs for Firebase Test Lab
         script: |
-          cd android
           ./gradlew assembleDebug
           ./gradlew assembleAndroidTest
           
@@ -89,13 +91,13 @@ workflows:
             
       - name: Copy APK for download
         script: |
-          cp android/app/build/outputs/apk/debug/app-debug.apk $CM_BUILD_DIR/public/app-debug.apk || echo "Debug APK not found"
+          cp app/build/outputs/apk/debug/app-debug.apk ../public/app-debug.apk || echo "Debug APK not found"
         
     artifacts:
-      - android/app/build/outputs/**/*.apk
-      - android/app/build/outputs/**/*.aab
-      - android/app/build/reports/tests/**/*
-      - public/app-debug.apk
+      - app/build/outputs/**/*.apk
+      - app/build/outputs/**/*.aab
+      - app/build/reports/tests/**/*
+      - ../public/app-debug.apk
       
     publishing:
       email:
