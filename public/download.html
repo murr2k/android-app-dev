@@ -75,26 +75,53 @@
             </ol>
         </div>
         
-        <p style="color: #666; font-size: 14px;">
-            Note: The APK will be available after the next Codemagic build completes.
+        <div id="status-message" style="padding: 1rem; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 8px; margin-top: 1rem;">
+            <p style="color: #856404; margin: 0;">
+                <strong>⏳ APK Not Available Yet</strong><br>
+                The APK will be available after a successful Codemagic build.
+                <a href="https://codemagic.io/app/6882243327296f27a20aeaea" target="_blank">Check build status →</a>
+            </p>
+        </div>
+        
+        <p style="color: #666; font-size: 14px; margin-top: 2rem;">
+            Last checked: <span id="last-checked"></span>
         </p>
     </div>
     
     <script>
+        // Update last checked time
+        document.getElementById('last-checked').textContent = new Date().toLocaleString();
+        
         // Check if APK exists
         fetch('/app-debug.apk', { method: 'HEAD' })
             .then(response => {
-                if (!response.ok) {
-                    document.getElementById('downloadBtn').innerHTML = 'APK Not Available Yet';
-                    document.getElementById('downloadBtn').style.background = '#999';
+                if (response.ok) {
+                    // APK is available
+                    document.getElementById('status-message').innerHTML = `
+                        <p style="color: #155724; margin: 0;">
+                            <strong>✅ APK Available!</strong><br>
+                            Click the download button above to install the app.
+                        </p>
+                    `;
+                    document.getElementById('status-message').style.background = '#d4edda';
+                    document.getElementById('status-message').style.borderColor = '#c3e6cb';
+                } else {
+                    // APK not available
+                    document.getElementById('downloadBtn').innerHTML = '⏳ APK Not Available';
+                    document.getElementById('downloadBtn').style.background = '#6c757d';
                     document.getElementById('downloadBtn').removeAttribute('href');
                 }
             })
             .catch(() => {
-                document.getElementById('downloadBtn').innerHTML = 'APK Not Available Yet';
-                document.getElementById('downloadBtn').style.background = '#999';
+                document.getElementById('downloadBtn').innerHTML = '❌ Check Connection';
+                document.getElementById('downloadBtn').style.background = '#dc3545';
                 document.getElementById('downloadBtn').removeAttribute('href');
             });
+            
+        // Auto-refresh every 30 seconds
+        setInterval(() => {
+            location.reload();
+        }, 30000);
     </script>
 </body>
 </html>
