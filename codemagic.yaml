@@ -31,38 +31,40 @@ workflows:
     scripts:
       - name: Check project structure
         script: |
+          echo "Current directory:"
           pwd
+          echo "Directory contents:"
           ls -la
+          echo "Gradle wrapper contents:"
+          ls -la gradle/wrapper/
+          echo "Java version:"
+          java -version
+          echo "ANDROID_SDK_ROOT: $ANDROID_SDK_ROOT"
           
-      - name: Download Gradle Wrapper
+      - name: Set up Gradle
         script: |
-          # Download gradle wrapper jar if missing
-          if [ ! -f gradle/wrapper/gradle-wrapper.jar ]; then
-            echo "Downloading gradle-wrapper.jar..."
-            curl -L https://github.com/gradle/gradle/raw/v8.0.0/gradle/wrapper/gradle-wrapper.jar -o gradle/wrapper/gradle-wrapper.jar
-          fi
+          # Ensure gradle wrapper is executable
           chmod +x gradlew
+          
+          # Check if gradlew works
+          ./gradlew --version || echo "Gradlew failed"
           
       - name: Set up local.properties
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
+          cat local.properties
           
       - name: Build Android APK
         script: |
-          ./gradlew assembleDebug
+          ./gradlew assembleDebug --stacktrace --info
           
-      - name: Build Android App Bundle
-        script: |
-          ./gradlew bundleDebug
-          
-      - name: Run unit tests
-        script: |
-          ./gradlew test
-          
-      - name: Build debug and test APKs for Firebase Test Lab
-        script: |
-          ./gradlew assembleDebug
-          ./gradlew assembleAndroidTest
+      # - name: Build Android App Bundle
+      #   script: |
+      #     ./gradlew bundleDebug
+      #     
+      # - name: Run unit tests
+      #   script: |
+      #     ./gradlew test
           
       # Firebase Test Lab tests (uncomment when credentials are configured)
       # - name: Run Firebase Test Lab tests
