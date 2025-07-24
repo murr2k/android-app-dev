@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LinkNode Demo - Android App</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2196F3, #03A9F4);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+        }
+        
+        .info-card h2 {
+            color: #2196F3;
+            margin-bottom: 1rem;
+        }
+        
+        .feature-list {
+            list-style: none;
+            margin: 1rem 0;
+        }
+        
+        .feature-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+        }
+        
+        .feature-list li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            background: #2196F3;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 24px;
+            font-weight: 500;
+            transition: transform 0.2s;
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .tech-badge {
+            background: #e3f2fd;
+            color: #1976d2;
+            padding: 0.25rem 0.75rem;
+            border-radius: 16px;
+            font-size: 0.875rem;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 3rem;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>LinkNode Demo</h1>
+            <p class="subtitle">Cloud-Native Android Development</p>
+        </div>
+        
+        <div class="info-card">
+            <h2>About This Project</h2>
+            <p>This is a demonstration Android app showcasing modern cloud-based development practices with a beautiful native UI inspired by LinkNode's design language.</p>
+            
+            <h3 style="margin-top: 1.5rem;">Key Features</h3>
+            <ul class="feature-list">
+                <li>Native Android UI with Material Design</li>
+                <li>Gradient hero sections with smooth animations</li>
+                <li>Feature cards showcasing capabilities</li>
+                <li>Responsive layout optimized for mobile</li>
+                <li>Cloud-based CI/CD pipeline</li>
+            </ul>
+        </div>
+        
+        <div class="info-card">
+            <h2>Technology Stack</h2>
+            <div class="tech-stack">
+                <span class="tech-badge">Kotlin</span>
+                <span class="tech-badge">Android SDK 34</span>
+                <span class="tech-badge">Material Design 3</span>
+                <span class="tech-badge">Gradle 8.0</span>
+                <span class="tech-badge">Codemagic CI/CD</span>
+                <span class="tech-badge">Firebase Test Lab</span>
+            </div>
+        </div>
+        
+        <div class="info-card">
+            <h2>Development Workflow</h2>
+            <p>This project uses a completely cloud-based development workflow:</p>
+            <ol style="margin: 1rem 0; padding-left: 1.5rem;">
+                <li>Code in cloud IDEs (GitHub Codespaces, Gitpod)</li>
+                <li>Push to GitHub for automatic builds</li>
+                <li>Codemagic builds and signs the app</li>
+                <li>Firebase Test Lab runs automated tests</li>
+                <li>Automatic deployment to Google Play</li>
+            </ol>
+        </div>
+        
+        <div class="info-card">
+            <h2>Get Started</h2>
+            <p>The Android app source code is available in the <code>/android</code> directory of this repository.</p>
+            <p style="margin-top: 1rem;">
+                <a href="https://github.com/murr2k/android-app-dev" class="cta-button">View on GitHub</a>
+            </p>
+        </div>
+        
+        <div class="footer">
+            <p>© 2024 LinkNode Demo. Built with ❤️ using cloud-native tools.</p>
+        </div>
+    </div>
+</body>
+</html>

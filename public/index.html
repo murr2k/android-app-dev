@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Welcome to Firebase Hosting</title>
+    <title>LinkNode Demo - Android App Project</title>
 
     <!-- update the version number as needed -->
     <script defer src="/__/firebase/12.0.0/firebase-app-compat.js"></script>
@@ -24,28 +24,46 @@
     <script defer src="/__/firebase/init.js?useEmulator=true"></script>
 
     <style media="screen">
-      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }
-      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }
-      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }
-      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}
-      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }
-      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }
-      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }
-      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }
-      @media (max-width: 600px) {
-        body, #message { margin-top: 0; background: white; box-shadow: none; }
-        body { border-top: 16px solid #ffa100; }
-      }
+      body { background: #f5f5f5; color: #333; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 0; padding: 0; }
+      .container { max-width: 800px; margin: 0 auto; padding: 2rem; }
+      .header { background: linear-gradient(135deg, #2196F3, #03A9F4); color: white; padding: 3rem; text-align: center; border-radius: 12px; margin-bottom: 2rem; }
+      h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+      .card { background: white; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 1.5rem; }
+      .button { display: inline-block; background: #2196F3; color: white; padding: 1rem 2rem; text-decoration: none; border-radius: 24px; font-weight: 500; margin: 0.5rem; }
+      .button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+      .footer { text-align: center; margin-top: 3rem; color: #666; }
     </style>
   </head>
   <body>
-    <div id="message">
-      <h2>Welcome</h2>
-      <h1>Firebase Hosting Setup Complete</h1>
-      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>
-      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>
+    <div class="container">
+      <div class="header">
+        <h1>LinkNode Demo</h1>
+        <p style="font-size: 1.2rem; opacity: 0.9;">Cloud-Native Android Development</p>
+      </div>
+      
+      <div class="card">
+        <h2 style="color: #2196F3;">Welcome to the LinkNode Demo Project</h2>
+        <p>This repository demonstrates modern cloud-based Android app development with a beautiful native UI inspired by LinkNode's design.</p>
+        <p style="margin-top: 1.5rem;">
+          <a href="/app-info.html" class="button">Learn More</a>
+          <a href="https://github.com/murr2k/android-app-dev" class="button" style="background: #333;">View Source</a>
+        </p>
+      </div>
+      
+      <div class="card">
+        <h3>🚀 Features</h3>
+        <ul style="line-height: 1.8;">
+          <li>Native Android app with Material Design</li>
+          <li>Cloud-based CI/CD with Codemagic</li>
+          <li>Automated testing on Firebase Test Lab</li>
+          <li>Zero local setup required</li>
+        </ul>
+      </div>
+      
+      <div class="footer">
+        <p>© 2024 LinkNode Demo. Powered by Firebase Hosting.</p>
+      </div>
     </div>
-    <p id="load">Firebase SDK Loading&hellip;</p>
 
     <script>
       document.addEventListener('DOMContentLoaded', function() {
