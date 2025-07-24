@@ -1,16 +1,14 @@
 workflows:
   android-workflow:
     name: Android App CI/CD
-    instance_type: mac_mini_m1
+    instance_type: mac_mini_m2
     max_build_duration: 60
     working_directory: android
     environment:
       groups: []
         # - firebase_credentials  # Uncomment when Firebase Test Lab is configured
       vars:
-        PACKAGE_NAME: "com.example.app"
-        GOOGLE_PLAY_TRACK: alpha
-        CM_BUILD_DIR: ".."
+        PACKAGE_NAME: "com.linknode.demo"
       java: 17
       
     triggering:
@@ -135,12 +133,7 @@ workflows:
     publishing:
       email:
         recipients:
-          - user@example.com
+          - murr2k@gmail.com
         notify:
           success: true
-          failure: true
-          
-      google_play:
-        credentials: $GCLOUD_SERVICE_ACCOUNT_CREDENTIALS
-        track: $GOOGLE_PLAY_TRACK
-        submit_as_draft: true
+          failure: false
