@@ -1,0 +1,43 @@
+name: Debug Firebase Deployment
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  debug-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: List files to be deployed
+        run: |
+          echo "Files in public directory:"
+          ls -la public/
+          echo ""
+          echo "Firebase config:"
+          cat firebase.json
+          echo ""
+          echo "Firebase project:"
+          cat .firebaserc
+      
+      - name: Install Firebase CLI
+        run: npm install -g firebase-tools
+      
+      - name: Deploy to Firebase Hosting
+        env:
+          FIREBASE_TOKEN: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ANDROID_SWARM_DEV_1_4D7C7 }}
+        run: |
+          echo "Deploying to Firebase..."
+          firebase deploy --only hosting --project android-swarm-dev-1-4d7c7 || true
+      
+      - name: Alternative deployment method
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_ANDROID_SWARM_DEV_1_4D7C7 }}
+          channelId: live
+          projectId: android-swarm-dev-1-4d7c7
+          target: android-swarm-dev-1-4d7c7
