@@ -1,6 +1,8 @@
 package com.linknode.demo
 
+import android.content.Intent
 import android.graphics.drawable.AnimationDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
 import android.widget.ScrollView
@@ -39,8 +41,9 @@ class MainActivity : AppCompatActivity() {
         }
         
         binding.btnLearnMore.setOnClickListener {
-            // Scroll to features section
-            binding.scrollView.smoothScrollTo(0, binding.featuresSection.top)
+            // Open linknode.com in browser
+            val intent = Intent(Intent.ACTION_VIEW, Uri.parse("https://linknode.com"))
+            startActivity(intent)
         }
         
         binding.cardFeature1.setOnClickListener {
