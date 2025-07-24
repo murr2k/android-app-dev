@@ -1,0 +1,50 @@
+name: Build APK Simple
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Set up JDK 17
+      uses: actions/setup-java@v3
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+    
+    - name: Make gradlew executable
+      run: chmod +x android/gradlew
+      
+    - name: Build Debug APK
+      run: |
+        cd android
+        ./gradlew assembleDebug --no-daemon
+        
+    - name: Check APK exists
+      run: |
+        ls -la android/app/build/outputs/apk/debug/
+        
+    - name: Copy APK to public folder
+      run: |
+        cp android/app/build/outputs/apk/debug/app-debug.apk public/app-debug.apk
+        ls -la public/
+    
+    - name: Upload APK as Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: linknode-demo-apk
+        path: public/app-debug.apk
+        retention-days: 7
+        
+    - name: Commit APK to repo (temporary)
+      run: |
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+        git config --global user.name "github-actions[bot]"
+        git add public/app-debug.apk
+        git diff --staged --quiet || (git commit -m "Add APK from GitHub Actions build" && git push)
