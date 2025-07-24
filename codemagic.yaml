@@ -4,11 +4,8 @@ workflows:
     instance_type: linux_x2
     max_build_duration: 60
     environment:
-      android_signing:
-        - android_keystore
-      groups:
-        - android_credentials
-        - firebase_credentials  # Add Firebase Test Lab credentials
+      groups: []
+        # - firebase_credentials  # Uncomment when Firebase Test Lab is configured
       vars:
         PACKAGE_NAME: "com.example.app"
         GOOGLE_PLAY_TRACK: alpha
@@ -34,24 +31,16 @@ workflows:
         script: |
           echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
           
-      - name: Set up key.properties for code signing
-        script: |
-          cat > "$CM_BUILD_DIR/android/key.properties" << EOF
-          storePassword=$CM_KEYSTORE_PASSWORD
-          keyPassword=$CM_KEY_ALIAS_PASSWORD
-          keyAlias=$CM_KEY_ALIAS
-          storeFile=/tmp/keystore.keystore
-          EOF
           
       - name: Build Android APK
         script: |
           cd android
-          ./gradlew assembleRelease
+          ./gradlew assembleDebug
           
       - name: Build Android App Bundle
         script: |
           cd android
-          ./gradlew bundleRelease
+          ./gradlew bundleDebug
           
       - name: Run unit tests
         script: |
@@ -64,38 +53,39 @@ workflows:
           ./gradlew assembleDebug
           ./gradlew assembleAndroidTest
           
-      - name: Run Firebase Test Lab tests
-        script: |
-          echo $GCLOUD_KEY_FILE > $CM_BUILD_DIR/gcloud_key_file.json
-          gcloud auth activate-service-account --key-file=$CM_BUILD_DIR/gcloud_key_file.json
-          gcloud --quiet config set project $FIREBASE_PROJECT
-          
-          cd android
-          
-          # Run instrumentation tests on multiple devices
-          gcloud firebase test android run \
-            --type instrumentation \
-            --app app/build/outputs/apk/debug/app-debug.apk \
-            --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
-            --device model=Pixel2,version=28,locale=en_US,orientation=portrait \
-            --device model=Pixel4,version=30,locale=en_US,orientation=portrait \
-            --device model=Nexus9,version=25,locale=en_US,orientation=landscape \
-            --timeout 20m \
-            --results-bucket gs://$FIREBASE_PROJECT-test-results \
-            --results-dir $CM_BUILD_ID \
-            || echo "Some tests failed, but continuing build"
-            
-      - name: Run Robo tests for smoke testing
-        script: |
-          cd android
-          
-          # Quick automated exploration test
-          gcloud firebase test android run \
-            --type robo \
-            --app app/build/outputs/apk/debug/app-debug.apk \
-            --device model=Pixel4,version=30,locale=en_US,orientation=portrait \
-            --timeout 10m \
-            --robo-directives click:button_login=,text:username_field=testuser
+      # Firebase Test Lab tests (uncomment when credentials are configured)
+      # - name: Run Firebase Test Lab tests
+      #   script: |
+      #     echo $GCLOUD_KEY_FILE > $CM_BUILD_DIR/gcloud_key_file.json
+      #     gcloud auth activate-service-account --key-file=$CM_BUILD_DIR/gcloud_key_file.json
+      #     gcloud --quiet config set project $FIREBASE_PROJECT
+      #     
+      #     cd android
+      #     
+      #     # Run instrumentation tests on multiple devices
+      #     gcloud firebase test android run \
+      #       --type instrumentation \
+      #       --app app/build/outputs/apk/debug/app-debug.apk \
+      #       --test app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk \
+      #       --device model=Pixel2,version=28,locale=en_US,orientation=portrait \
+      #       --device model=Pixel4,version=30,locale=en_US,orientation=portrait \
+      #       --device model=Nexus9,version=25,locale=en_US,orientation=landscape \
+      #       --timeout 20m \
+      #       --results-bucket gs://$FIREBASE_PROJECT-test-results \
+      #       --results-dir $CM_BUILD_ID \
+      #       || echo "Some tests failed, but continuing build"
+      #       
+      # - name: Run Robo tests for smoke testing
+      #   script: |
+      #     cd android
+      #     
+      #     # Quick automated exploration test
+      #     gcloud firebase test android run \
+      #       --type robo \
+      #       --app app/build/outputs/apk/debug/app-debug.apk \
+      #       --device model=Pixel4,version=30,locale=en_US,orientation=portrait \
+      #       --timeout 10m \
+      #       --robo-directives click:button_login=,text:username_field=testuser
             
       - name: Copy APK for download
         script: |
