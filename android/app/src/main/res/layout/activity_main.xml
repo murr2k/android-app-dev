@@ -7,6 +7,13 @@
     android:fitsSystemWindows="true"
     tools:context=".MainActivity">
 
+    <!-- Particle Animation Background -->
+    <com.linknode.demo.ParticleAnimationView
+        android:id="@+id/particleView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="-1dp" />
+
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBar"
         android:layout_width="match_parent"
@@ -40,17 +47,23 @@
                 android:id="@+id/heroSection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/gradient_background"
+                android:background="@drawable/animated_gradient_background"
                 android:gravity="center"
                 android:orientation="vertical"
                 android:padding="48dp">
+
+                <ImageView
+                    android:layout_width="80dp"
+                    android:layout_height="80dp"
+                    android:src="@drawable/linknode_logo"
+                    android:layout_marginBottom="16dp" />
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="sans-serif-medium"
                     android:gravity="center"
-                    android:text="Connect Your World"
+                    android:text="Linknode Energy Monitor"
                     android:textColor="@color/white"
                     android:textSize="32sp" />
 
@@ -59,7 +72,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="16dp"
                     android:gravity="center"
-                    android:text="Experience seamless connectivity with LinkNode's innovative platform"
+                    android:text="Real-Time Power Monitoring • Cloud-Native Android Development by Murray Kopit"
                     android:textColor="@color/white_translucent"
                     android:textSize="18sp" />
 
@@ -106,7 +119,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
                     android:fontFamily="sans-serif-medium"
-                    android:text="Why Choose LinkNode?"
+                    android:text="Why Choose Linknode?"
                     android:textColor="@color/text_primary"
                     android:textSize="28sp" />
 
@@ -158,7 +171,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="sans-serif-medium"
-                                    android:text="Smart Connectivity"
+                                    android:text="Real-Time Power Monitoring"
                                     android:textColor="@color/text_primary"
                                     android:textSize="18sp" />
 
@@ -166,7 +179,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
-                                    android:text="Connect multiple devices seamlessly with our intelligent routing system"
+                                    android:text="Monitor your energy consumption with Eagle-200 smart meter integration"
                                     android:textColor="@color/text_secondary"
                                     android:textSize="14sp" />
 
@@ -208,7 +221,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="sans-serif-medium"
-                                    android:text="Secure Platform"
+                                    android:text="Cloud-Native Architecture"
                                     android:textColor="@color/text_primary"
                                     android:textSize="18sp" />
 
@@ -216,7 +229,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
-                                    android:text="Enterprise-grade security with end-to-end encryption"
+                                    android:text="Deployed on Fly.io's global edge network with automatic failover"
                                     android:textColor="@color/text_secondary"
                                     android:textSize="14sp" />
 
@@ -257,7 +270,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:fontFamily="sans-serif-medium"
-                                    android:text="Real-time Analytics"
+                                    android:text="AI-Augmented Development"
                                     android:textColor="@color/text_primary"
                                     android:textSize="18sp" />
 
@@ -265,7 +278,7 @@
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_marginTop="4dp"
-                                    android:text="Monitor and optimize your network performance with detailed insights"
+                                    android:text="Built in under 24 hours using revolutionary AI development techniques"
                                     android:textColor="@color/text_secondary"
                                     android:textSize="14sp" />
 
@@ -291,7 +304,7 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="© 2024 LinkNode. All rights reserved."
+                    android:text="© 2024 Linknode. Built with AI-Augmented Development"
                     android:textColor="@color/text_secondary"
                     android:textSize="14sp" />
 

@@ -1,5 +1,6 @@
 package com.linknode.demo
 
+import android.graphics.drawable.AnimationDrawable
 import android.os.Bundle
 import android.view.View
 import android.widget.ScrollView
@@ -17,6 +18,12 @@ class MainActivity : AppCompatActivity() {
 
         // Set status bar color
         window.statusBarColor = ContextCompat.getColor(this, R.color.primary_dark)
+        
+        // Start animated gradient background
+        val animDrawable = binding.heroSection.background as AnimationDrawable
+        animDrawable.setEnterFadeDuration(2000)
+        animDrawable.setExitFadeDuration(2000)
+        animDrawable.start()
         
         // Set up click listeners
         setupClickListeners()
