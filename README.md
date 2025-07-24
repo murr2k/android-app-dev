@@ -115,6 +115,10 @@ Configure these in Codemagic or your IDE:
 3. Choose and set up your preferred cloud IDE
 4. Start developing and let Codemagic handle the builds!
 
+## 🌐 Live Demo
+
+- Firebase Hosting: https://android-swarm-dev-1-4d7c7.firebaseapp.com
+
 ## 📞 Support
 
 - Codemagic Docs: https://docs.codemagic.io
