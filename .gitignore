@@ -30,6 +30,8 @@ firebase-test-results/
 .gradle/
 gradle-app.setting
 .gradletasknamecache
+# Don't ignore gradle wrapper jar
+!gradle-wrapper.jar
 
 # Logs
 *.log
