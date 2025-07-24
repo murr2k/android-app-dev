@@ -37,7 +37,7 @@ workflows:
     scripts:
       - name: Set up local.properties
         script: |
-          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/local.properties"
+          echo "sdk.dir=$ANDROID_SDK_ROOT" > "$CM_BUILD_DIR/android/local.properties"
           
       - name: Set up key.properties for code signing
         script: |

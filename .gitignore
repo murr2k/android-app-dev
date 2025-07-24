@@ -20,6 +20,7 @@ local.properties
 gcloud_key_file.json
 firebase-debug.log
 .firebase/
+.firebaserc
 
 # Test results
 test-results/
