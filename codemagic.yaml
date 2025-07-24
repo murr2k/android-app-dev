@@ -13,11 +13,6 @@ workflows:
         PACKAGE_NAME: "com.example.app"
         GOOGLE_PLAY_TRACK: alpha
       java: 17
-      android_sdk: 
-        platforms:
-          - platform-android-34
-        build_tools:
-          - 34.0.0
       
     triggering:
       events:

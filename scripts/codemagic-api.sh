@@ -7,6 +7,7 @@
 
 API_BASE="https://api.codemagic.io"
 API_TOKEN="${CODEMAGIC_API_TOKEN:-8u2x8z907-AgIZ114Ofpyea_sSKWZHC2-tBIxRjBn_E}"
+APP_ID="${CODEMAGIC_APP_ID:-6882243327296f27a20aeaea}"  # android-app-dev
 
 # Function to make API calls
 api_call() {
