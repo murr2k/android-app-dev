@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Download Linknode Demo App</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            background: white;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2196F3;
+            margin-bottom: 1rem;
+        }
+        .download-btn {
+            display: inline-block;
+            background: #2196F3;
+            color: white;
+            padding: 1rem 2rem;
+            text-decoration: none;
+            border-radius: 24px;
+            font-weight: 500;
+            margin: 1rem 0;
+        }
+        .instructions {
+            text-align: left;
+            margin: 2rem 0;
+            padding: 1rem;
+            background: #f5f5f5;
+            border-radius: 8px;
+        }
+        .instructions li {
+            margin: 0.5rem 0;
+        }
+        .qr-code {
+            margin: 2rem 0;
+            padding: 1rem;
+            background: white;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Linknode Demo</h1>
+        <p>Cloud-Native Android Development by Murray Kopit</p>
+        
+        <div class="qr-code">
+            <p><strong>Scan this QR code on your Android phone:</strong></p>
+            <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https://android-swarm-dev-1-4d7c7.firebaseapp.com/download.html" alt="QR Code">
+        </div>
+        
+        <a href="/app-debug.apk" class="download-btn" id="downloadBtn">Download APK</a>
+        
+        <div class="instructions">
+            <h3>Installation Instructions:</h3>
+            <ol>
+                <li>Enable "Install from Unknown Sources" in your Android settings</li>
+                <li>Download the APK file</li>
+                <li>Open the downloaded file</li>
+                <li>Tap "Install" when prompted</li>
+            </ol>
+        </div>
+        
+        <p style="color: #666; font-size: 14px;">
+            Note: The APK will be available after the next Codemagic build completes.
+        </p>
+    </div>
+    
+    <script>
+        // Check if APK exists
+        fetch('/app-debug.apk', { method: 'HEAD' })
+            .then(response => {
+                if (!response.ok) {
+                    document.getElementById('downloadBtn').innerHTML = 'APK Not Available Yet';
+                    document.getElementById('downloadBtn').style.background = '#999';
+                    document.getElementById('downloadBtn').removeAttribute('href');
+                }
+            })
+            .catch(() => {
+                document.getElementById('downloadBtn').innerHTML = 'APK Not Available Yet';
+                document.getElementById('downloadBtn').style.background = '#999';
+                document.getElementById('downloadBtn').removeAttribute('href');
+            });
+    </script>
+</body>
+</html>

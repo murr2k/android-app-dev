@@ -101,11 +101,16 @@ workflows:
             --device model=Pixel4,version=30,locale=en_US,orientation=portrait \
             --timeout 10m \
             --robo-directives click:button_login=,text:username_field=testuser
+            
+      - name: Copy APK for download
+        script: |
+          cp android/app/build/outputs/apk/debug/app-debug.apk $CM_BUILD_DIR/public/app-debug.apk || echo "Debug APK not found"
         
     artifacts:
       - android/app/build/outputs/**/*.apk
       - android/app/build/outputs/**/*.aab
       - android/app/build/reports/tests/**/*
+      - public/app-debug.apk
       
     publishing:
       email:
