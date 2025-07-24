@@ -1,0 +1,53 @@
+# IDE
+.idea/
+.vscode/
+*.iml
+.DS_Store
+
+# Build outputs
+*.apk
+*.aab
+build/
+out/
+target/
+
+# Local configuration
+local.properties
+*.keystore
+*.jks
+
+# Firebase
+gcloud_key_file.json
+firebase-debug.log
+.firebase/
+
+# Test results
+test-results/
+firebase-test-results/
+*.ec
+
+# Gradle
+.gradle/
+gradle-app.setting
+.gradletasknamecache
+
+# Logs
+*.log
+logs/
+
+# Environment files
+.env
+.env.local
+
+# Node modules (if using npm tools)
+node_modules/
+
+# Python
+__pycache__/
+*.pyc
+.python-version
+
+# Temporary files
+*.tmp
+*.temp
+.cache/
