@@ -1,0 +1,9 @@
+Initial release of LinkNode Demo!
+
+• Enterprise-grade security with end-to-end encryption
+• Universal connectivity: WiFi, Bluetooth, NFC support
+• Real-time analytics and monitoring dashboards
+• Modern Material Design interface
+• Transform any Android device into a smart IoT node
+
+Visit linknode.com for production solutions.
