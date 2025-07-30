@@ -1,0 +1,149 @@
+name: Google Play Release (Manual Trigger)
+
+on:
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Release track'
+        required: true
+        default: 'internal'
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+      rollout_percentage:
+        description: 'Rollout percentage (1-100, production only)'
+        required: false
+        default: '10'
+        type: string
+      release_notes:
+        description: 'Release notes'
+        required: false
+        default: 'Bug fixes and performance improvements'
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup Gradle Cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          ~/.gradle/notifications
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+    
+    - name: Prepare Release
+      run: |
+        # For demo/testing, create a temporary keystore
+        # In production, you'd decode from secrets
+        cd android
+        if [ ! -f "linknode-release.keystore" ]; then
+          keytool -genkey -v -keystore linknode-release.keystore \
+            -alias linknode -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass linknode2024 -keypass linknode2024 \
+            -dname "CN=Linknode Demo, OU=Development, O=Linknode, L=San Francisco, ST=CA, C=US" \
+            -noprompt
+        fi
+        
+    - name: Make gradlew executable
+      run: chmod +x android/gradlew
+      
+    - name: Build Release AAB
+      env:
+        KEYSTORE_PASSWORD: linknode2024
+        KEY_ALIAS: linknode
+        KEY_PASSWORD: linknode2024
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
+        VERSION_NAME: "1.0.${{ github.run_number }}"
+      run: |
+        cd android
+        ./gradlew bundleRelease --no-daemon
+        
+    - name: Upload AAB to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-aab-${{ github.run_number }}
+        path: android/app/build/outputs/bundle/release/app-release.aab
+        retention-days: 30
+        
+    - name: Prepare release notes
+      run: |
+        mkdir -p whatsnew
+        echo "${{ github.event.inputs.release_notes }}" > whatsnew/whatsnew-en-US
+        
+        # Also create a markdown file for reference
+        cat > release-info.md << EOF
+        # Release Information
+        
+        **Track**: ${{ github.event.inputs.track }}
+        **Version**: 1.0.${{ github.run_number }}
+        **Build Number**: ${{ github.run_number }}
+        **Rollout**: ${{ github.event.inputs.rollout_percentage }}%
+        
+        ## Release Notes
+        ${{ github.event.inputs.release_notes }}
+        
+        ## Next Steps
+        1. Download the AAB from artifacts
+        2. Upload to Google Play Console
+        3. Select the ${{ github.event.inputs.track }} track
+        4. Use the release notes above
+        EOF
+        
+    - name: Upload to Google Play (when API available)
+      # This step will only work once PLAY_STORE_CREDENTIALS is set up
+      if: ${{ env.PLAY_STORE_CREDENTIALS != '' }}
+      uses: r0adkll/upload-google-play@v1
+      continue-on-error: true
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_CREDENTIALS }}
+        packageName: com.linknode.demo
+        releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+        track: ${{ github.event.inputs.track }}
+        status: completed
+        userFraction: ${{ github.event.inputs.track == 'production' && format('0.{0}', github.event.inputs.rollout_percentage) || '1.0' }}
+        whatsNewDirectory: whatsnew
+        
+    - name: Upload release info
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-info-${{ github.run_number }}
+        path: |
+          release-info.md
+          whatsnew/
+        
+    - name: Summary
+      run: |
+        echo "## 📱 Release Build Complete!" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        echo "**Version**: 1.0.${{ github.run_number }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Track**: ${{ github.event.inputs.track }}" >> $GITHUB_STEP_SUMMARY
+        echo "**Status**: AAB built successfully" >> $GITHUB_STEP_SUMMARY
+        echo "" >> $GITHUB_STEP_SUMMARY
+        if [ -n "${{ secrets.PLAY_STORE_CREDENTIALS }}" ]; then
+          echo "✅ Automated upload attempted" >> $GITHUB_STEP_SUMMARY
+        else
+          echo "⚠️ Manual upload required (API not configured)" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Next Steps:" >> $GITHUB_STEP_SUMMARY
+          echo "1. Download \`release-aab-${{ github.run_number }}\` from artifacts" >> $GITHUB_STEP_SUMMARY
+          echo "2. Upload to Google Play Console" >> $GITHUB_STEP_SUMMARY
+          echo "3. Select **${{ github.event.inputs.track }}** track" >> $GITHUB_STEP_SUMMARY
+        fi
