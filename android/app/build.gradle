@@ -4,11 +4,11 @@ plugins {
 }
 
 android {
-    namespace 'com.linknode.demo'
+    namespace 'com.linknode.showcase'
     compileSdk 35
 
     defaultConfig {
-        applicationId "com.linknode.demo"
+        applicationId "com.linknode.showcase"
         minSdk 24
         targetSdk 35
         versionCode System.getenv("GITHUB_RUN_NUMBER") ? System.getenv("GITHUB_RUN_NUMBER").toInteger() : 1

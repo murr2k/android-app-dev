@@ -1,4 +1,4 @@
-package com.linknode.demo
+package com.linknode.showcase
 
 import android.animation.ValueAnimator
 import android.content.Context

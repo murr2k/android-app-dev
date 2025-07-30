@@ -1,4 +1,4 @@
-package com.linknode.demo
+package com.linknode.showcase
 
 import android.content.Intent
 import android.graphics.drawable.AnimationDrawable
