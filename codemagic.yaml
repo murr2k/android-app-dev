@@ -13,17 +13,18 @@ workflows:
       
     triggering:
       events:
-        - push
-        - pull_request
+        # - push  # Disabled - using GitHub Actions for automatic builds
+        # - pull_request
+        - tag  # Only trigger on version tags if needed
       branch_patterns:
         - pattern: main
-          include: true
+          include: false  # Disabled
           source: true
         - pattern: develop
-          include: true
+          include: false  # Disabled
           source: true
       tag_patterns:
-        - pattern: 'v*'
+        - pattern: 'v-codemagic-*'  # Only specific tags like v-codemagic-1.0
           include: true
           
     scripts:
