@@ -1,0 +1,63 @@
+name: Test Gradle Cache
+
+on:
+  workflow_dispatch:
+
+jobs:
+  test-cache:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup Gradle Cache
+      uses: actions/cache@v4
+      id: gradle-cache
+      with:
+        path: |
+          ~/.gradle/caches
+          ~/.gradle/wrapper
+          ~/.gradle/notifications
+        key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle*', '**/gradle-wrapper.properties') }}
+        restore-keys: |
+          ${{ runner.os }}-gradle-
+          
+    - name: Display cache status
+      run: |
+        echo "Cache hit: ${{ steps.gradle-cache.outputs.cache-hit }}"
+        echo "Cache key: ${{ steps.gradle-cache.outputs.cache-primary-key }}"
+        
+    - name: Check Gradle wrapper before
+      run: |
+        echo "=== Gradle wrapper check ==="
+        if [ -d ~/.gradle/wrapper ]; then
+          echo "✅ Gradle wrapper cache exists"
+          du -sh ~/.gradle/wrapper/ || true
+        else
+          echo "❌ No Gradle wrapper cache"
+        fi
+        
+    - name: Make gradlew executable
+      run: chmod +x android/gradlew
+      
+    - name: Run Gradle task
+      run: |
+        cd android
+        time ./gradlew tasks --no-daemon
+        
+    - name: Check cache size after
+      run: |
+        echo "=== Cache sizes ==="
+        echo "Gradle caches:"
+        du -sh ~/.gradle/caches/ 2>/dev/null || echo "No caches directory"
+        echo "Gradle wrapper:"
+        du -sh ~/.gradle/wrapper/ 2>/dev/null || echo "No wrapper directory"
+        echo "Total Gradle directory:"
+        du -sh ~/.gradle/ 2>/dev/null || echo "No .gradle directory"
