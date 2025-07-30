@@ -1,0 +1,133 @@
+name: Google Play Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      track:
+        description: 'Release track'
+        required: true
+        default: 'internal'
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+      rollout_percentage:
+        description: 'Rollout percentage (for production only)'
+        required: false
+        default: '100'
+        type: string
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Extract version from tag
+      if: github.event_name == 'push'
+      run: |
+        VERSION_NAME=${GITHUB_REF#refs/tags/v}
+        echo "VERSION_NAME=$VERSION_NAME" >> $GITHUB_ENV
+        echo "TRACK=production" >> $GITHUB_ENV
+        echo "ROLLOUT_PERCENTAGE=10" >> $GITHUB_ENV
+        
+    - name: Set version from input
+      if: github.event_name == 'workflow_dispatch'
+      run: |
+        echo "VERSION_NAME=1.0.${{ github.run_number }}" >> $GITHUB_ENV
+        echo "TRACK=${{ github.event.inputs.track }}" >> $GITHUB_ENV
+        echo "ROLLOUT_PERCENTAGE=${{ github.event.inputs.rollout_percentage }}" >> $GITHUB_ENV
+    
+    - name: Decode Keystore
+      run: |
+        echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 -d > android/linknode-release.keystore
+        
+    - name: Make gradlew executable
+      run: chmod +x android/gradlew
+      
+    - name: Build Release AAB
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
+      run: |
+        cd android
+        ./gradlew bundleRelease --no-daemon
+        
+    - name: Upload AAB to artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: release-aab
+        path: android/app/build/outputs/bundle/release/app-release.aab
+        retention-days: 7
+        
+    - name: Create Release Notes
+      id: release_notes
+      run: |
+        if [ "${{ github.event_name }}" == "push" ]; then
+          # Get commits since last tag
+          PREVIOUS_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREVIOUS_TAG" ]; then
+            COMMITS=$(git log --pretty=format:"- %s" $PREVIOUS_TAG..HEAD)
+          else
+            COMMITS=$(git log --pretty=format:"- %s" --max-count=10)
+          fi
+          
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "Release $VERSION_NAME" >> $GITHUB_ENV
+          echo "" >> $GITHUB_ENV
+          echo "Changes:" >> $GITHUB_ENV
+          echo "$COMMITS" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        else
+          echo "RELEASE_NOTES<<EOF" >> $GITHUB_ENV
+          echo "Manual release to ${{ github.event.inputs.track }} track" >> $GITHUB_ENV
+          echo "Build #${{ github.run_number }}" >> $GITHUB_ENV
+          echo "EOF" >> $GITHUB_ENV
+        fi
+        
+    - name: Create whatsnew directory
+      run: |
+        mkdir -p whatsnew
+        echo "${{ env.RELEASE_NOTES }}" > whatsnew/whatsnew-en-US
+        
+    - name: Upload to Google Play
+      uses: r0adkll/upload-google-play@v1
+      with:
+        serviceAccountJsonPlainText: ${{ secrets.PLAY_STORE_CREDENTIALS }}
+        packageName: com.linknode.demo
+        releaseFiles: android/app/build/outputs/bundle/release/app-release.aab
+        track: ${{ env.TRACK }}
+        inAppUpdatePriority: 2
+        status: completed
+        userFraction: ${{ env.TRACK == 'production' && env.ROLLOUT_PERCENTAGE != '100' && format('0.{0}', env.ROLLOUT_PERCENTAGE) || omit }}
+        whatsNewDirectory: whatsnew
+        
+    - name: Create GitHub Release
+      if: github.event_name == 'push'
+      uses: softprops/action-gh-release@v1
+      with:
+        body: ${{ env.RELEASE_NOTES }}
+        files: android/app/build/outputs/bundle/release/app-release.aab
+        
+    - name: Upload mapping file
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: proguard-mappings
+        path: android/app/build/outputs/mapping/release/
+        retention-days: 90

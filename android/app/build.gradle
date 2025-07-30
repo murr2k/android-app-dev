@@ -11,16 +11,31 @@ android {
         applicationId "com.linknode.demo"
         minSdk 24
         targetSdk 34
-        versionCode 1
-        versionName "1.0"
+        versionCode System.getenv("GITHUB_RUN_NUMBER") ? System.getenv("GITHUB_RUN_NUMBER").toInteger() : 1
+        versionName System.getenv("VERSION_NAME") ?: "1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        release {
+            storeFile file("../linknode-release.keystore")
+            storePassword System.getenv("KEYSTORE_PASSWORD") ?: "linknode2024"
+            keyAlias System.getenv("KEY_ALIAS") ?: "linknode"
+            keyPassword System.getenv("KEY_PASSWORD") ?: "linknode2024"
+        }
+    }
+
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+        debug {
+            applicationIdSuffix ".debug"
+            debuggable true
         }
     }
     compileOptions {

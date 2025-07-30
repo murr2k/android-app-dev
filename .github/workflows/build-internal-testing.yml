@@ -1,0 +1,109 @@
+name: Build for Internal Testing
+
+on:
+  workflow_dispatch:
+    inputs:
+      build_type:
+        description: 'Build output type'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - apk
+          - aab
+          - both
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up JDK 17
+      uses: actions/setup-java@v4
+      with:
+        java-version: '17'
+        distribution: 'temurin'
+        
+    - name: Setup build environment
+      run: |
+        cd android
+        # Check if keystore exists in repo (for demo purposes)
+        if [ -f "linknode-release.keystore" ]; then
+          echo "✅ Using existing keystore from repository"
+          echo "KEYSTORE_EXISTS=true" >> $GITHUB_ENV
+        else
+          # Check if we have a secret keystore
+          if [ -n "${{ secrets.RELEASE_KEYSTORE }}" ]; then
+            echo "✅ Decoding keystore from GitHub secret"
+            echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 -d > linknode-release.keystore
+            echo "KEYSTORE_EXISTS=true" >> $GITHUB_ENV
+          else
+            echo "❌ No keystore found - build will fail"
+            echo "Please either:"
+            echo "1. Add RELEASE_KEYSTORE secret to GitHub"
+            echo "2. Or ensure linknode-release.keystore exists in android/"
+            echo "KEYSTORE_EXISTS=false" >> $GITHUB_ENV
+            exit 1
+          fi
+        fi
+        
+    - name: Make gradlew executable
+      run: chmod +x android/gradlew
+      
+    - name: Build Release APK
+      if: ${{ github.event.inputs.build_type == 'apk' || github.event.inputs.build_type == 'both' }}
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || 'linknode2024' }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS || 'linknode' }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'linknode2024' }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
+      run: |
+        cd android
+        ./gradlew assembleRelease --no-daemon
+        
+    - name: Build Release AAB
+      if: ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == 'both' }}
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD || 'linknode2024' }}
+        KEY_ALIAS: ${{ secrets.KEY_ALIAS || 'linknode' }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD || 'linknode2024' }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
+      run: |
+        cd android
+        ./gradlew bundleRelease --no-daemon
+        
+    - name: Upload APK
+      if: ${{ github.event.inputs.build_type == 'apk' || github.event.inputs.build_type == 'both' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: linknode-release-apk
+        path: android/app/build/outputs/apk/release/app-release.apk
+        
+    - name: Upload AAB
+      if: ${{ github.event.inputs.build_type == 'aab' || github.event.inputs.build_type == 'both' }}
+      uses: actions/upload-artifact@v4
+      with:
+        name: linknode-release-aab
+        path: android/app/build/outputs/bundle/release/app-release.aab
+        
+    - name: Display download instructions
+      run: |
+        echo "✅ Build completed successfully!"
+        echo ""
+        echo "📦 Build artifacts:"
+        if [ "${{ github.event.inputs.build_type }}" = "apk" ] || [ "${{ github.event.inputs.build_type }}" = "both" ]; then
+          echo "- APK: linknode-release-apk"
+        fi
+        if [ "${{ github.event.inputs.build_type }}" = "aab" ] || [ "${{ github.event.inputs.build_type }}" = "both" ]; then
+          echo "- AAB: linknode-release-aab"
+        fi
+        echo ""
+        echo "📥 To download:"
+        echo "1. Click on the Summary link above"
+        echo "2. Download the artifact(s) from the Artifacts section"
+        echo "3. Upload to Google Play Console Internal Testing track"
+        echo ""
+        echo "ℹ️ Version code: ${{ github.run_number }}"
