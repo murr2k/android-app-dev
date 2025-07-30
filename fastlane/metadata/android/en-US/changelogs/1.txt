@@ -1,4 +1,4 @@
-Initial release of LinkNode Demo!
+Initial release of Linknode Demo!
 
 • Enterprise-grade security with end-to-end encryption
 • Universal connectivity: WiFi, Bluetooth, NFC support

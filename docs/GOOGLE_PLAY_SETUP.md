@@ -1,6 +1,6 @@
 # Google Play Publishing Setup Guide
 
-This guide walks through setting up the Google Play publishing pipeline for the LinkNode Demo app.
+This guide walks through setting up the Google Play publishing pipeline for the Linknode Demo app.
 
 ## Prerequisites
 

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Create Google Play Store graphics for LinkNode Demo app
+Create Google Play Store graphics for Linknode Demo app
 """
 
 from PIL import Image, ImageDraw, ImageFont, ImageFilter
@@ -10,7 +10,7 @@ import os
 output_dir = "fastlane/metadata/android/en-US/images"
 os.makedirs(output_dir, exist_ok=True)
 
-# Define colors based on the LinkNode theme
+# Define colors based on the Linknode theme
 PRIMARY_COLOR = (63, 81, 181)  # Indigo
 SECONDARY_COLOR = (255, 87, 34)  # Deep Orange
 ACCENT_COLOR = (0, 188, 212)  # Cyan
@@ -111,7 +111,7 @@ def create_feature_graphic():
     
     if font_large:
         # Title
-        draw.text((width // 2, height // 2 - 50), "LinkNode Demo", 
+        draw.text((width // 2, height // 2 - 50), "Linknode Demo", 
                   fill=(255, 255, 255), font=font_large, anchor="mm")
         
         if font_medium:
@@ -148,7 +148,7 @@ def create_screenshots():
         font_body = None
     
     if font_title:
-        draw.text((width // 2, 140), "LinkNode Demo", fill=(255, 255, 255), font=font_title, anchor="mm")
+        draw.text((width // 2, 140), "Linknode Demo", fill=(255, 255, 255), font=font_title, anchor="mm")
     
     # Feature cards
     card_y = 300

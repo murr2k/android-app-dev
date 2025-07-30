@@ -1,6 +1,6 @@
 # Internal Testing Setup Guide
 
-This guide helps you set up Internal Testing for the LinkNode Demo app.
+This guide helps you set up Internal Testing for the Linknode Demo app.
 
 ## Step 1: Prepare the Keystore
 
@@ -57,7 +57,7 @@ The workflow will use the keystore that's already in the repository. Note: This 
 4. Add release notes:
    ```
    Initial internal testing release
-   - Core LinkNode Demo functionality
+   - Core Linknode Demo functionality
    - Testing Play Store integration
    ```
 5. Save and review

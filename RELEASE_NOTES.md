@@ -1,10 +1,10 @@
-# LinkNode Demo - Release Notes
+# Linknode Demo - Release Notes
 
 ## Version 1.0 - Initial Release
 
 ### 🎉 What's New
 
-Welcome to LinkNode Demo! This initial release showcases the power of transforming any Android device into a sophisticated IoT node.
+Welcome to Linknode Demo! This initial release showcases the power of transforming any Android device into a sophisticated IoT node.
 
 ### ✨ Key Features
 
@@ -40,7 +40,7 @@ Welcome to LinkNode Demo! This initial release showcases the power of transformi
 
 ### 📝 Notes
 
-- This is a demonstration app showcasing LinkNode capabilities
+- This is a demonstration app showcasing Linknode capabilities
 - For production deployments, please visit linknode.com
 - Feedback and suggestions welcome!
 
