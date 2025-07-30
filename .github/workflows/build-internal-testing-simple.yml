@@ -40,9 +40,12 @@ jobs:
       run: |
         cd android/app
         # Create a temporary build.gradle with temp keystore
-        sed -i 's/linknode-release.keystore/temp-release.keystore/g' build.gradle
-        sed -i 's/|| "linknode2024"/|| "temp123"/g' build.gradle
-        sed -i 's/|| "linknode"/|| "temp"/g' build.gradle
+        sed -i 's|../linknode-release.keystore|../temp-release.keystore|g' build.gradle
+        sed -i 's|"linknode2024"|"temp123"|g' build.gradle
+        sed -i 's|"linknode"|"temp"|g' build.gradle
+        # Show the changes for debugging
+        echo "=== Updated signing config ==="
+        grep -A5 "signingConfigs" build.gradle
         
     - name: Make gradlew executable
       run: chmod +x android/gradlew
