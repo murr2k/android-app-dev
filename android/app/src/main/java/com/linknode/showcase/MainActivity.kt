@@ -8,7 +8,7 @@ import android.view.View
 import android.widget.ScrollView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import com.linknode.demo.databinding.ActivityMainBinding
+import com.linknode.showcase.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
