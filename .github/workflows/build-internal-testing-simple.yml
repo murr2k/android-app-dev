@@ -31,7 +31,7 @@ jobs:
       run: |
         cd android
         keytool -genkey -v -keystore temp-release.keystore \
-          -alias temp -keyalg RSA -keysize 2048 -validity 30 \
+          -alias temp -keyalg RSA -keysize 2048 -validity 10000 \
           -storepass temp123 -keypass temp123 \
           -dname "CN=Temp Testing, OU=Testing, O=Linknode Demo, L=SF, ST=CA, C=US" \
           -noprompt
