@@ -1,0 +1,25 @@
+Initial Release - Version 1.0 (32)
+
+Welcome to Linknode Showcase! This innovative IoT energy monitoring app demonstrates the power of AI-augmented development.
+
+What's New:
+• Real-time power monitoring with Eagle-200 smart meter integration
+• Beautiful, modern Material Design interface
+• Animated particle effects and gradient backgrounds
+• Cloud-native architecture deployed on Fly.io
+• Responsive design optimized for all Android devices
+
+Key Features:
+• Monitor your energy consumption in real-time
+• Secure, privacy-focused design - no personal data collection
+• Built with cutting-edge Android development practices
+• Supports Android 7.0 (API 24) and above
+• Targets Android 15 (API 35) for the latest features
+
+Technical Highlights:
+• Developed using AI-augmented techniques in under 24 hours
+• Automated CI/CD pipeline with GitHub Actions
+• Professional app signing and release management
+• Kotlin-based architecture with modern Android components
+
+This showcase app demonstrates rapid, professional Android development capabilities using the latest tools and methodologies.
