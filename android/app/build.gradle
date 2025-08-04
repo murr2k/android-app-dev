@@ -11,8 +11,8 @@ android {
         applicationId "com.linknode.showcase"
         minSdk 24
         targetSdk 35
-        versionCode System.getenv("GITHUB_RUN_NUMBER") ? System.getenv("GITHUB_RUN_NUMBER").toInteger() : 1
-        versionName System.getenv("VERSION_NAME") ?: "1.0"
+        versionCode 33
+        versionName "1.0.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }

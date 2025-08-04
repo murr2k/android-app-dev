@@ -1,0 +1,13 @@
+Version 1.0.1 (33)
+
+What's New:
+• Automated deployment via GitHub Actions CI/CD pipeline
+• Improved build process and deployment workflow
+• Bug fixes and performance improvements
+
+Technical Updates:
+• Integrated Google Play API for automated releases
+• Enhanced keystore management for secure builds
+• Streamlined version management system
+
+This update demonstrates our commitment to continuous improvement and automated delivery processes.
