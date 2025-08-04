@@ -5,6 +5,22 @@ on:
     tags:
       - 'v*.*.*'  # Triggers on version tags like v1.2.3
   workflow_dispatch:  # Allow manual trigger
+    inputs:
+      track:
+        description: 'Release track'
+        required: true
+        default: 'internal'
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+      submit_for_review:
+        description: 'Submit for review (clicks the Submit button)'
+        required: false
+        default: false
+        type: boolean
 
 permissions:
   contents: write  # Allow pushing commits
@@ -82,15 +98,42 @@ jobs:
           cd android
           ./gradlew bundleRelease
           
+      - name: Determine track and status
+        id: deployment
+        run: |
+          # Default track based on trigger
+          if [[ "${{ github.event_name }}" == "push" ]]; then
+            # Tag push defaults to alpha
+            TRACK="alpha"
+            STATUS="completed"
+          else
+            # Manual trigger uses input
+            TRACK="${{ github.event.inputs.track || 'internal' }}"
+            
+            # Determine release status
+            if [[ "${{ github.event.inputs.submit_for_review }}" == "true" ]]; then
+              STATUS="completed"  # Submits for review
+              echo "✅ Release will be submitted for review"
+            else
+              STATUS="draft"  # Saves as draft, manual review needed
+              echo "📝 Release will be saved as draft"
+            fi
+          fi
+          
+          echo "track=$TRACK" >> $GITHUB_OUTPUT
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "📱 Deploying to track: $TRACK with status: $STATUS"
+          
       - name: Upload to Play Store
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
           packageName: com.linknode.showcase
           releaseFiles: android/app/build/outputs/bundle/release/*.aab
-          track: internal  # Start with internal track for safety
-          status: completed
+          track: ${{ steps.deployment.outputs.track }}
+          status: ${{ steps.deployment.outputs.status }}
           whatsNewDirectory: fastlane/metadata/android/en-US/changelogs/
+          inAppUpdatePriority: 2
           
       - name: Commit version changes
         if: success()
