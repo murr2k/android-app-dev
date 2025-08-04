@@ -6,12 +6,18 @@ on:
       - 'v*.*.*'  # Triggers on version tags like v1.2.3
   workflow_dispatch:  # Allow manual trigger
 
+permissions:
+  contents: write  # Allow pushing commits
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
       
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -22,6 +28,44 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
         
+      - name: Auto-increment version
+        id: version
+        run: |
+          # Read current version
+          VERSION_CODE=$(grep versionCode version.properties | cut -d'=' -f2)
+          VERSION_NAME=$(grep versionName version.properties | cut -d'=' -f2)
+          
+          # Increment version code
+          NEW_VERSION_CODE=$((VERSION_CODE + 1))
+          
+          # Extract version name from tag if available
+          if [[ "${{ github.ref }}" == refs/tags/v* ]]; then
+            NEW_VERSION_NAME="${{ github.ref_name }}"
+            NEW_VERSION_NAME="${NEW_VERSION_NAME#v}"  # Remove 'v' prefix
+          else
+            # Auto-increment patch version
+            IFS='.' read -ra VERSION_PARTS <<< "$VERSION_NAME"
+            PATCH=$((VERSION_PARTS[2] + 1))
+            NEW_VERSION_NAME="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$PATCH"
+          fi
+          
+          # Update version.properties
+          echo "versionCode=$NEW_VERSION_CODE" > version.properties
+          echo "versionName=$NEW_VERSION_NAME" >> version.properties
+          
+          # Output for use in next steps
+          echo "version_code=$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "version_name=$NEW_VERSION_NAME" >> $GITHUB_OUTPUT
+          
+          # Create changelog if it doesn't exist
+          mkdir -p fastlane/metadata/android/en-US/changelogs
+          if [ ! -f "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt" ]; then
+            echo "Version $NEW_VERSION_NAME ($NEW_VERSION_CODE)" > "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
+            echo "" >> "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
+            echo "• Automated release via GitHub Actions" >> "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
+            echo "• Bug fixes and performance improvements" >> "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
+          fi
+          
       - name: Make gradlew executable
         run: chmod +x android/gradlew
         
@@ -47,3 +91,15 @@ jobs:
           track: internal  # Start with internal track for safety
           status: completed
           whatsNewDirectory: fastlane/metadata/android/en-US/changelogs/
+          
+      - name: Commit version changes
+        if: success()
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          
+          git add version.properties
+          git add "fastlane/metadata/android/en-US/changelogs/${{ steps.version.outputs.version_code }}.txt"
+          
+          git commit -m "🤖 Auto-increment version to ${{ steps.version.outputs.version_name }} (${{ steps.version.outputs.version_code }})" || echo "No changes to commit"
+          git push
