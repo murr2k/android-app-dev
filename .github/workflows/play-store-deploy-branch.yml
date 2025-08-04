@@ -1,0 +1,135 @@
+name: Deploy to Play Store (Branch-based)
+
+on:
+  push:
+    branches:
+      - 'release/internal/*'
+      - 'release/alpha/*'
+      - 'release/beta/*'
+      - 'release/production/*'
+
+permissions:
+  contents: write
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
+          
+      - name: Extract track from branch name
+        id: track
+        run: |
+          BRANCH="${{ github.ref_name }}"
+          
+          if [[ $BRANCH == release/internal/* ]]; then
+            TRACK="internal"
+            STATUS="completed"
+          elif [[ $BRANCH == release/alpha/* ]]; then
+            TRACK="alpha"
+            STATUS="completed"
+          elif [[ $BRANCH == release/beta/* ]]; then
+            TRACK="beta"
+            STATUS="completed"
+          elif [[ $BRANCH == release/production/* ]]; then
+            TRACK="production"
+            # Check branch suffix for auto-submit
+            if [[ $BRANCH == */submit ]]; then
+              STATUS="completed"
+              echo "✅ Will submit for review"
+            else
+              STATUS="draft"
+              echo "📝 Will save as draft"
+            fi
+          fi
+          
+          echo "track=$TRACK" >> $GITHUB_OUTPUT
+          echo "status=$STATUS" >> $GITHUB_OUTPUT
+          echo "📱 Deploying to $TRACK track with status: $STATUS"
+          
+      # Rest of the workflow steps (same as main workflow)
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+      
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v3
+        
+      - name: Auto-increment version
+        id: version
+        run: |
+          # Same version increment logic
+          VERSION_CODE=$(grep versionCode version.properties | cut -d'=' -f2)
+          VERSION_NAME=$(grep versionName version.properties | cut -d'=' -f2)
+          NEW_VERSION_CODE=$((VERSION_CODE + 1))
+          
+          # Extract version from branch if specified
+          BRANCH="${{ github.ref_name }}"
+          if [[ $BRANCH =~ /v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
+            NEW_VERSION_NAME="${BASH_REMATCH[1]}"
+          else
+            IFS='.' read -ra VERSION_PARTS <<< "$VERSION_NAME"
+            PATCH=$((VERSION_PARTS[2] + 1))
+            NEW_VERSION_NAME="${VERSION_PARTS[0]}.${VERSION_PARTS[1]}.$PATCH"
+          fi
+          
+          echo "versionCode=$NEW_VERSION_CODE" > version.properties
+          echo "versionName=$NEW_VERSION_NAME" >> version.properties
+          
+          echo "version_code=$NEW_VERSION_CODE" >> $GITHUB_OUTPUT
+          echo "version_name=$NEW_VERSION_NAME" >> $GITHUB_OUTPUT
+          
+          mkdir -p fastlane/metadata/android/en-US/changelogs
+          if [ ! -f "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt" ]; then
+            echo "Version $NEW_VERSION_NAME ($NEW_VERSION_CODE)" > "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
+            echo "" >> "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
+            echo "• Automated release via GitHub Actions" >> "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
+            echo "• Bug fixes and performance improvements" >> "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
+          fi
+          
+      - name: Make gradlew executable
+        run: chmod +x android/gradlew
+        
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > android/linknode-release.keystore
+          
+      - name: Build AAB
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          cd android
+          ./gradlew bundleRelease
+          
+      - name: Upload to Play Store
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+          packageName: com.linknode.showcase
+          releaseFiles: android/app/build/outputs/bundle/release/*.aab
+          track: ${{ steps.track.outputs.track }}
+          status: ${{ steps.track.outputs.status }}
+          whatsNewDirectory: fastlane/metadata/android/en-US/changelogs/
+          inAppUpdatePriority: 2
+          
+      - name: Commit version changes
+        if: success()
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'actions@github.com'
+          
+          git add version.properties
+          git add "fastlane/metadata/android/en-US/changelogs/${{ steps.version.outputs.version_code }}.txt"
+          
+          git commit -m "🤖 Auto-increment version to ${{ steps.version.outputs.version_name }} (${{ steps.version.outputs.version_code }})" || echo "No changes to commit"
+          
+          # Push to main branch
+          git push origin HEAD:main
